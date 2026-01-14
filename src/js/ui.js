@@ -32,12 +32,16 @@ export function initUiBindings() {
     if (v) setIconColor(v);
   });
   iconSize.addEventListener("input", () => {
-    state.iconStyle.sizePct = Number(iconSize.value);
+    const val = Number(iconSize.value);
+    state.iconStyle.sizePct = val;
+    iconSize.setAttribute("aria-valuenow", String(val));
     updateRangeLabel("iconSizeValue", iconSize.value, "%");
     renderAll();
   });
   iconOffset.addEventListener("input", () => {
-    state.iconStyle.yOffsetPct = Number(iconOffset.value);
+    const val = Number(iconOffset.value);
+    state.iconStyle.yOffsetPct = val;
+    iconOffset.setAttribute("aria-valuenow", String(val));
     updateRangeLabel("iconOffsetValue", iconOffset.value, "%");
     renderAll();
   });
@@ -54,9 +58,11 @@ export function initUiBindings() {
 
   const zoom = Number(btn.dataset.zoom);
 
-  zoomGroup.querySelectorAll(".chip").forEach(b =>
-    b.classList.toggle("active", b === btn)
-  );
+  zoomGroup.querySelectorAll(".chip").forEach(b => {
+    const isActive = b === btn;
+    b.classList.toggle("active", isActive);
+    b.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
 
   state.ui.zoom = zoom;
 
@@ -103,7 +109,10 @@ export function initUiBindings() {
   });
 
   radiusRange.addEventListener("input", () => {
-    state.export.radius = Number(radiusRange.value);
+    const val = Number(radiusRange.value);
+    state.export.radius = val;
+    radiusRange.setAttribute("aria-valuenow", String(val));
+    updateRangeLabel("radiusValue", String(val), "px");
     renderAll();
   });
 

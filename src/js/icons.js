@@ -17,10 +17,39 @@ export async function initIconPicker() {
 
   let iconNames = [];
   let loaded = false;
+  let scrollPosition = 0;
+  
+  // Detect if mobile device
+  const isMobile = () => window.innerWidth <= 768;
+
+  function closeModal() {
+    modal.dataset.open = "false";
+    modal.setAttribute("aria-hidden", "true");
+    
+    // Only remove body scroll lock on desktop
+    if (!isMobile()) {
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('position');
+      document.body.style.removeProperty('top');
+      document.body.style.removeProperty('width');
+      window.scrollTo(0, scrollPosition);
+    }
+    
+    openBtn.focus();
+  }
 
   openBtn.addEventListener("click", async () => {
     modal.dataset.open = "true";
     modal.setAttribute("aria-hidden", "false");
+    
+    // Only apply body scroll lock on desktop
+    if (!isMobile()) {
+      scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.width = "100%";
+    }
 
     if (!loaded) {
       showLoading(loadingIndicator);
@@ -66,11 +95,6 @@ export async function initIconPicker() {
       hideLoading(loadingIndicator);
     }, 200); // debounce search
   });
-
-  function closeModal() {
-    modal.dataset.open = "false";
-    modal.setAttribute("aria-hidden", "true");
-  }
 }
 
 /* ---------- Loaders ---------- */
@@ -111,8 +135,10 @@ async function renderIcons(names, grid, loadingIndicator) {
     tile.type = "button";
     tile.className = "iconTile iconTile--loading";
     tile.dataset.icon = name;
+    tile.setAttribute("aria-label", `Select ${name} icon`);
+    tile.setAttribute("role", "gridcell");
     tile.innerHTML = `
-      <div class="iconPlaceholder"></div>
+      <div class="iconPlaceholder" aria-hidden="true"></div>
       <div class="iconName">${name}</div>
     `;
     frag.appendChild(tile);
@@ -137,6 +163,14 @@ async function renderIcons(names, grid, loadingIndicator) {
 
             // Add click handler
             tile.addEventListener("click", async () => {
+              // Update ARIA selected state for all tiles
+              grid.querySelectorAll('.iconTile').forEach(t => {
+                t.dataset.selected = "false";
+                t.setAttribute("aria-selected", "false");
+              });
+              tile.dataset.selected = "true";
+              tile.setAttribute("aria-selected", "true");
+              
               state.icon.name = name;
               state.icon.svgText = svg;
               state.icon.exportName = name; // Reset export name when selecting new icon

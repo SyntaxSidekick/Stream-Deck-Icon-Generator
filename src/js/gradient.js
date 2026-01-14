@@ -85,8 +85,11 @@ export function initGradientControls() {
     const type = btn.dataset.type;
     state.background.type = type;
 
-    typeGroup.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-    btn.classList.add("active");
+    typeGroup.querySelectorAll(".chip").forEach(c => {
+      const isActive = c === btn;
+      c.classList.toggle("active", isActive);
+      c.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
 
     angleField.style.display = type === "linear" ? "" : "none";
     renderAll();
@@ -103,13 +106,17 @@ export function initGradientControls() {
       if (selectedStyle === style) {
         selectedStyle = null;
         btn.classList.remove("active");
+        btn.setAttribute("aria-pressed", "false");
         return;
       }
       
       selectedStyle = style;
 
-      styleGroup.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-      btn.classList.add("active");
+      styleGroup.querySelectorAll(".chip").forEach(c => {
+        const isActive = c === btn;
+        c.classList.toggle("active", isActive);
+        c.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
 
       const baseColor = randomBaseColorHex.value;
       const useBaseColor = baseColor && normalizeHex(baseColor);
@@ -123,7 +130,11 @@ export function initGradientControls() {
 
   // angle
   angle.addEventListener("input", () => {
-    state.background.angle = Number(angle.value);
+    const val = Number(angle.value);
+    state.background.angle = val;
+    angle.setAttribute("aria-valuenow", String(val));
+    const angleValueSpan = document.getElementById("angleValue");
+    if (angleValueSpan) angleValueSpan.textContent = `${val}°`;
     renderAll();
   });
 
@@ -162,7 +173,11 @@ export function initGradientControls() {
     setActiveStopColor(v);
   });
   stopPos.addEventListener("input", () => {
-    setActiveStopPos(Number(stopPos.value));
+    const val = Number(stopPos.value);
+    setActiveStopPos(val);
+    stopPos.setAttribute("aria-valuenow", String(val));
+    const stopPosValueSpan = document.getElementById("stopPosValue");
+    if (stopPosValueSpan) stopPosValueSpan.textContent = `${val}%`;
   });
 
   function setActiveStopColor(color) {
