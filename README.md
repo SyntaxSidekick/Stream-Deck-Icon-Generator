@@ -133,6 +133,68 @@ http://localhost:3000
    - Select the preset you want to delete
    - Click the delete button (🗑️)
 
+### Adding Custom SVG Icons
+
+The application currently includes 549+ FontAwesome icons, but you can easily add your own custom SVG files:
+
+1. **Add SVG Files:**
+   - Place your SVG files in `public/icons/fontawesome/` directory
+   - Use lowercase names with hyphens (e.g., `my-custom-icon.svg`)
+   - Ensure SVGs have a `viewBox` attribute for proper scaling
+
+2. **Update the Icon Index:**
+   
+   **Option A: PowerShell (Windows)**
+   ```powershell
+   Get-ChildItem public/icons/fontawesome/*.svg |
+     Select-Object -ExpandProperty BaseName |
+     Sort-Object |
+     ConvertTo-Json |
+     Set-Content public/icons/fontawesome/index.json
+   ```
+
+   **Option B: Bash (macOS/Linux)**
+   ```bash
+   ls public/icons/fontawesome/*.svg | 
+     sed 's|.*/||;s|\.svg$||' | 
+     sort | 
+     jq -R -s -c 'split("\n")[:-1]' > public/icons/fontawesome/index.json
+   ```
+
+   **Option C: Node.js (Cross-platform)**
+   ```javascript
+   const fs = require('fs');
+   const path = require('path');
+   
+   const iconDir = './public/icons/fontawesome';
+   const icons = fs.readdirSync(iconDir)
+     .filter(f => f.endsWith('.svg'))
+     .map(f => path.basename(f, '.svg'))
+     .sort();
+   
+   fs.writeFileSync(
+     path.join(iconDir, 'index.json'),
+     JSON.stringify(icons, null, 2)
+   );
+   ```
+
+3. **Rebuild (if using build process):**
+   ```bash
+   npm run build
+   ```
+
+4. **Refresh the Application:**
+   - Reload the page
+   - Your custom icons will appear in the icon picker
+   - They are searchable by filename
+
+**SVG Tips:**
+- Keep file sizes small (< 10KB recommended)
+- Use single-color SVGs for best results with the color picker
+- Remove unnecessary metadata and comments
+- Ensure proper `viewBox` for consistent scaling
+- Use kebab-case naming (lowercase with hyphens)
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
