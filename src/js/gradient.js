@@ -4,127 +4,124 @@ import { renderAll } from "./ui.js";
 export function initGradientControls() {
   const gradBar = document.getElementById("gradBar");
 
-  const typeGroup = document.getElementById("gradientType");
+  const gradientTypeBtn = document.getElementById("gradientTypeBtn");
   const angleField = document.getElementById("angleField");
   const angle = document.getElementById("angle");
+  const angleValueDisplay = document.getElementById("angleValueDisplay");
+  const stopPosValueDisplay = document.getElementById("stopPosValueDisplay");
 
   const addStop = document.getElementById("addStop");
   const removeStop = document.getElementById("removeStop");
+  const resetGradient = document.getElementById("resetGradient");
+  const stopIndicators = document.getElementById("stopIndicators");
 
   const stopColor = document.getElementById("stopColor");
   const stopColorHex = document.getElementById("stopColorHex");
   const stopPos = document.getElementById("stopPos");
+  const stopColorField = document.getElementById("stopColorField");
+  const toggleStopColor = document.getElementById("toggleStopColor");
+  const stopColorVisible = document.getElementById("stopColorVisible");
   
   const randomizeBtn = document.getElementById("randomizeGradient");
-  const randomBaseColor = document.getElementById("randomBaseColor");
-  const randomBaseColorHex = document.getElementById("randomBaseColorHex");
-  const clearBaseColorBtn = document.getElementById("clearBaseColor");
-  const styleGroup = document.getElementById("gradientStyle");
 
-  let selectedStyle = null; // null means custom/manual
+  // Knob elements
+  const angleKnob = document.getElementById("angleKnob");
+  const stopPosKnob = document.getElementById("stopPosKnob");
+
+  // Base color and style presets
+  const baseColorPicker = document.getElementById("baseColorPicker");
+  const styleButtons = document.querySelectorAll(".btn-style");
+
+  // Toggle color mode (RGB/HSL)
+  if (toggleStopColor) {
+    // Set initial state
+    updateColorModeButton();
+    
+    toggleStopColor.addEventListener("click", () => {
+      state.ui.colorMode = state.ui.colorMode === "rgb" ? "hsl" : "rgb";
+      updateColorModeButton();
+      syncActiveStopControls();
+    });
+  }
+  
+  function updateColorModeButton() {
+    if (!toggleStopColor) return;
+    toggleStopColor.textContent = state.ui.colorMode.toUpperCase();
+    toggleStopColor.setAttribute("aria-label", `Color mode: ${state.ui.colorMode.toUpperCase()}`);
+    toggleStopColor.dataset.mode = state.ui.colorMode;
+  }
 
   // build stop DOM
   rebuildStopsDom();
+  rebuildStopIndicators();
   
   // Listen for preset loads
   document.addEventListener("preset-loaded", () => {
     rebuildStopsDom();
+    rebuildStopIndicators();
     syncActiveStopControls();
   });
-  
-  // Base color sync
-  if (randomBaseColor && randomBaseColorHex) {
-    randomBaseColor.addEventListener("input", () => {
-      randomBaseColorHex.value = randomBaseColor.value;
-    });
-    randomBaseColorHex.addEventListener("input", () => {
-      const v = normalizeHex(randomBaseColorHex.value);
-      if (v) {
-        randomBaseColor.value = v;
-        randomBaseColorHex.value = v;
-      }
+
+  // Gradient type toggle
+  if (gradientTypeBtn) {
+    gradientTypeBtn.addEventListener("click", () => {
+      const currentType = state.background.type;
+      const newType = currentType === "linear" ? "radial" : "linear";
+      state.background.type = newType;
+      gradientTypeBtn.dataset.type = newType;
+      angleField.style.display = newType === "linear" ? "" : "none";
+      renderAll();
     });
   }
-  
-  // Clear base color
-  if (clearBaseColorBtn) {
-    clearBaseColorBtn.addEventListener("click", () => {
-      randomBaseColor.value = "#667eea";
-      randomBaseColorHex.value = "#667eea";
+
+  // Reset gradient
+  if (resetGradient) {
+    resetGradient.addEventListener("click", () => {
+      state.background.type = "linear";
+      state.background.angle = 135;
+      state.background.stops = [
+        { id: "a", color: "#ff0000", pos: 0 },   // Red
+        { id: "b", color: "#00ff00", pos: 50 },  // Green
+        { id: "c", color: "#0000ff", pos: 100 }  // Blue
+      ];
+      state.ui.activeStopId = "b";
+      angle.value = "135";
+      if (angleValueDisplay) angleValueDisplay.textContent = "135°";
+      rebuildStopsDom();
+      rebuildStopIndicators();
+      syncActiveStopControls();
+      renderAll(true);
     });
   }
   
   // Randomize gradient
   if (randomizeBtn) {
     randomizeBtn.addEventListener("click", () => {
-      const baseColor = randomBaseColorHex.value;
-      const useBaseColor = baseColor && normalizeHex(baseColor);
-      
-      randomizeGradient(useBaseColor, selectedStyle);
+      randomizeGradient(null, null);
       rebuildStopsDom();
+      rebuildStopIndicators();
       syncActiveStopControls();
       
-      // Update UI controls
       angle.value = String(state.background.angle);
+      if (angleValueDisplay) angleValueDisplay.textContent = `${state.background.angle}°`;
       angleField.style.display = state.background.type === "linear" ? "" : "none";
-      
-      if (typeGroup) {
-        typeGroup.querySelectorAll(".chip").forEach(btn => {
-          btn.classList.toggle("active", btn.dataset.type === state.background.type);
-        });
-      }
       
       renderAll(true);
     });
   }
 
-  // type
-  typeGroup.addEventListener("click", (e) => {
-    const btn = e.target.closest(".chip");
-    if (!btn) return;
-    const type = btn.dataset.type;
-    state.background.type = type;
-
-    typeGroup.querySelectorAll(".chip").forEach(c => {
-      const isActive = c === btn;
-      c.classList.toggle("active", isActive);
-      c.setAttribute("aria-pressed", isActive ? "true" : "false");
-    });
-
-    angleField.style.display = type === "linear" ? "" : "none";
-    renderAll();
-  });
-
-  // gradient style
-  if (styleGroup) {
-    styleGroup.addEventListener("click", (e) => {
-      const btn = e.target.closest(".chip");
-      if (!btn) return;
-      const style = btn.dataset.style;
-      
-      // Toggle: if clicking the active one, deactivate it
-      if (selectedStyle === style) {
-        selectedStyle = null;
-        btn.classList.remove("active");
-        btn.setAttribute("aria-pressed", "false");
-        return;
-      }
-      
-      selectedStyle = style;
-
-      styleGroup.querySelectorAll(".chip").forEach(c => {
-        const isActive = c === btn;
-        c.classList.toggle("active", isActive);
-        c.setAttribute("aria-pressed", isActive ? "true" : "false");
+  // Base color and gradient style presets
+  if (baseColorPicker && styleButtons.length > 0) {
+    styleButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const style = btn.dataset.style;
+        const baseColor = baseColorPicker.value;
+        applyGradientStyle(style, baseColor);
+        rebuildStopsDom();
+        rebuildStopIndicators();
+        syncActiveStopControls();
+        renderAll(true);
       });
-
-      const baseColor = randomBaseColorHex.value;
-      const useBaseColor = baseColor && normalizeHex(baseColor);
-      
-      applyGradientStyle(style, useBaseColor);
-      rebuildStopsDom();
-      syncActiveStopControls();
-      renderAll(true);
     });
   }
 
@@ -133,8 +130,8 @@ export function initGradientControls() {
     const val = Number(angle.value);
     state.background.angle = val;
     angle.setAttribute("aria-valuenow", String(val));
-    const angleValueSpan = document.getElementById("angleValue");
-    if (angleValueSpan) angleValueSpan.textContent = `${val}°`;
+    if (angleValueDisplay) angleValueDisplay.textContent = `${val}°`;
+    updateKnobPosition(angleKnob, val, 0, 360);
     renderAll();
   });
 
@@ -146,6 +143,7 @@ export function initGradientControls() {
     state.background.stops.push({ id, color, pos });
     state.ui.activeStopId = id;
     rebuildStopsDom();
+    rebuildStopIndicators();
     syncActiveStopControls();
     renderAll();
   });
@@ -159,6 +157,7 @@ export function initGradientControls() {
     state.background.stops.splice(idx, 1);
     state.ui.activeStopId = state.background.stops[Math.max(0, idx - 1)].id;
     rebuildStopsDom();
+    rebuildStopIndicators();
     syncActiveStopControls();
     renderAll();
   });
@@ -172,12 +171,17 @@ export function initGradientControls() {
     if (!v) return;
     setActiveStopColor(v);
   });
+  if (stopColorVisible) {
+    stopColorVisible.addEventListener("input", () => {
+      setActiveStopColor(stopColorVisible.value);
+    });
+  }
   stopPos.addEventListener("input", () => {
     const val = Number(stopPos.value);
     setActiveStopPos(val);
     stopPos.setAttribute("aria-valuenow", String(val));
-    const stopPosValueSpan = document.getElementById("stopPosValue");
-    if (stopPosValueSpan) stopPosValueSpan.textContent = `${val}%`;
+    if (stopPosValueDisplay) stopPosValueDisplay.textContent = `${val}%`;
+    updateKnobPosition(stopPosKnob, val, 0, 100);
   });
 
   function setActiveStopColor(color) {
@@ -186,8 +190,10 @@ export function initGradientControls() {
     s.color = color;
     stopColor.value = color;
     stopColorHex.value = color;
+    if (stopColorVisible) stopColorVisible.value = color;
     renderAll();
     updateStopsDomOnly();
+    rebuildStopIndicators();
   }
 
   function setActiveStopPos(pos) {
@@ -236,9 +242,18 @@ export function initGradientControls() {
 
   // initial sync
   angle.value = String(state.background.angle);
+  if (angleValueDisplay) angleValueDisplay.textContent = `${state.background.angle}°`;
+  updateKnobPosition(angleKnob, state.background.angle, 0, 360);
   angleField.style.display = state.background.type === "linear" ? "" : "none";
+  if (gradientTypeBtn) gradientTypeBtn.dataset.type = state.background.type;
   syncActiveStopControls();
   updateStopsDomOnly();
+
+  function updateKnobPosition(knob, value, min, max) {
+    if (!knob) return;
+    const percent = ((value - min) / (max - min)) * 100;
+    knob.style.left = `${percent}%`;
+  }
 
   function rebuildStopsDom() {
     gradBar.innerHTML = "";
@@ -252,8 +267,6 @@ export function initGradientControls() {
       el.addEventListener("click", () => {
         state.ui.activeStopId = s.id;
         syncActiveStopControls();
-        updateStopsDomOnly();
-        renderAll();
       });
     }
     updateStopsDomOnly();
@@ -271,12 +284,66 @@ export function initGradientControls() {
     }
   }
 
+  function rebuildStopIndicators() {
+    const stopIndicators = document.getElementById("stopIndicators");
+    if (!stopIndicators) return;
+
+    stopIndicators.innerHTML = "";
+    state.background.stops.forEach(stop => {
+      const indicator = document.createElement("div");
+      indicator.className = "stopIndicator";
+      indicator.dataset.stopId = stop.id;
+      indicator.style.backgroundColor = stop.color;
+      indicator.title = `${stop.color} at ${stop.pos}%`;
+      indicator.setAttribute("role", "button");
+      indicator.setAttribute("tabindex", "0");
+      indicator.setAttribute("aria-label", `Color stop: ${stop.color} at ${stop.pos}%`);
+      
+      if (stop.id === state.ui.activeStopId) {
+        indicator.classList.add("active");
+      }
+      
+      indicator.addEventListener("click", () => {
+        state.ui.activeStopId = stop.id;
+        syncActiveStopControls();
+      });
+      
+      indicator.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          state.ui.activeStopId = stop.id;
+          syncActiveStopControls();
+        }
+      });
+      
+      stopIndicators.appendChild(indicator);
+    });
+  }
+
   function syncActiveStopControls() {
     const s = getActiveStop();
     if (!s) return;
     stopColor.value = s.color;
     stopColorHex.value = s.color;
+    if (stopColorVisible) stopColorVisible.value = s.color;
     stopPos.value = String(s.pos);
+    if (stopPosValueDisplay) stopPosValueDisplay.textContent = `${s.pos}%`;
+    updateKnobPosition(stopPosKnob, s.pos, 0, 100);
+    
+    // Update button state
+    if (removeStop) {
+      removeStop.disabled = state.background.stops.length <= 2;
+    }
+
+    // Update stop markers
+    document.querySelectorAll(".stop").forEach(el => {
+      el.dataset.active = el.dataset.id === state.ui.activeStopId ? "true" : "false";
+    });
+    
+    // Update stop indicators
+    document.querySelectorAll(".stopIndicator").forEach(el => {
+      el.classList.toggle("active", el.dataset.stopId === state.ui.activeStopId);
+    });
   }
 
   function getActiveStop() {
@@ -510,12 +577,28 @@ function generateVibrantColors(count) {
 
 function generateGrayscaleColors(count, baseLightness) {
   const colors = [];
-  // Generate grayscale colors spanning from dark to light
+  // For very dark colors (like black), create a proper dark to light gradient
+  // For very light colors (like white), create light to dark gradient
+  // For mid-tones, create a range around the base
+  
+  let minLight, maxLight;
+  
+  if (baseLightness < 20) {
+    // Very dark base color - go from dark to light
+    minLight = baseLightness;
+    maxLight = 70;
+  } else if (baseLightness > 80) {
+    // Very light base color - go from mid to light
+    minLight = 30;
+    maxLight = baseLightness;
+  } else {
+    // Mid-tone - create range around base
+    minLight = Math.max(10, baseLightness - 30);
+    maxLight = Math.min(90, baseLightness + 30);
+  }
+  
+  const range = maxLight - minLight;
   for (let i = 0; i < count; i++) {
-    // Create a range around the base lightness
-    const minLight = Math.max(5, baseLightness - 35);
-    const maxLight = Math.min(95, baseLightness + 35);
-    const range = maxLight - minLight;
     const light = minLight + (i / (count - 1)) * range;
     colors.push(hslToHex(0, 0, light)); // Hue and saturation at 0 for grayscale
   }

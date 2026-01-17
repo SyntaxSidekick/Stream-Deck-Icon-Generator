@@ -1,5 +1,7 @@
 # Stream Deck Icon Generator
 
+> ⚠️ **DEVELOPMENT STATUS**: This project is currently under active development. Features are being implemented and bugs are being fixed. Please report any issues you encounter on the [Issues page](https://github.com/SyntaxSidekick/Stream-Deck-Icon-Generator/issues).
+
 A powerful web-based tool for creating custom Stream Deck icons with gradient backgrounds. Generate professional-looking icons by combining FontAwesome SVG graphics with customizable gradient overlays, all exportable as PNG files in multiple sizes.
 
 ## Features
@@ -11,10 +13,14 @@ A powerful web-based tool for creating custom Stream Deck icons with gradient ba
 - ✓ **SVG Caching** - Intelligent caching system for 90% faster loading
 
 ### Gradient Customization
-- ✓ **Linear & Radial Gradients** - Switch between gradient types
+- ✓ **Linear & Radial Gradients** - Switch between gradient types with visual toggle
 - ✓ **Multi-stop Gradients** - Add, remove, and position unlimited color stops
 - ✓ **Interactive Gradient Bar** - Drag color stops directly on the preview bar
-- ✓ **Gradient Randomizer** - Generate random gradients with optional base color
+- ✓ **Color Mode Toggle** - Switch between RGB and HSL color modes
+- ✓ **Visual Slider Controls** - Draggable knobs for angle and position adjustments
+- ✓ **Stop Indicators** - Visual color swatches showing all gradient stops
+- ✓ **Gradient Randomizer** - Generate random gradients instantly
+- ✓ **Base Color Selection** - Choose a base color for gradient generation
 - ✓ **Preset Styles** - Choose from Smooth, Glossy, Vibrant, and Subtle gradient styles
 - ✓ **Color-Aware Generation** - Create grayscale or same-hue gradients based on base color
 
@@ -81,21 +87,29 @@ http://localhost:3000
 ### Basic Workflow
 
 1. **Select an Icon**
-   - Click "Choose Icon" to open the icon picker
+   - Click on one of the preset framework icons (React, Angular, Vue, Python, etc.)
+   - Or click the "+" button to open the full icon picker
    - Search for icons by name (e.g., "github", "twitter", "gaming")
    - Click an icon to select it
 
 2. **Customize the Gradient**
-   - Choose between Linear or Radial gradient types
-   - Drag color stops on the gradient bar to reposition them
-   - Click stops to change their colors
-   - Add or remove stops using the buttons
-   - Apply preset gradient styles (Smooth, Glossy, Vibrant, Subtle)
+   - **Choose Base Color**: Select a base color using the color picker
+   - **Apply Preset Style**: Click Smooth, Glossy, Vibrant, or Subtle to generate a gradient based on your base color
+   - **Switch Gradient Type**: Toggle between Linear and Radial gradients
+   - **Adjust Angle**: For linear gradients, drag the angle slider (0-360°)
+   - **Modify Color Stops**:
+     - Click on a stop indicator to make it active
+     - Use the color picker to change the active stop's color
+     - Drag the position slider to reposition the stop (0-100%)
+     - Click "+" to add a new stop
+     - Click "−" to remove the active stop (minimum 2 stops required)
+   - **Toggle Color Mode**: Switch between RGB and HSL modes
+   - **Randomize**: Click "Randomize" for instant random gradients
 
 3. **Adjust Icon Settings**
-   - Set icon color using the color picker
-   - Adjust icon size (20-80%)
-   - Fine-tune vertical offset (-30% to +30%)
+   - Set icon color using the color picker (default: white)
+   - Adjust icon size using the slider (20-80%)
+   - Fine-tune vertical offset with the slider (-30% to +30%)
 
 4. **Export Your Icon**
    - Choose export size (72, 144, or 256 pixels)
@@ -107,16 +121,24 @@ http://localhost:3000
 ### Gradient Randomizer
 
 1. **Basic Randomization:**
-   - Click "Randomize Gradient" to generate a random gradient
+   - Click "Randomize" button to generate a completely random gradient
+   - Random type (linear or radial), angle, number of stops, and colors
 
-2. **Color-Based Randomization:**
-   - Select a base color in the "Random base color" picker
-   - Click "Randomize Gradient" to generate variations based on that color
-   - For grayscale base colors (low saturation), generates grayscale gradients
-   - For colorful base colors, generates same-hue gradients with varying lightness
+2. **Base Color Gradients:**
+   - Select a base color using the "Base Color" picker
+   - Click a preset style button (Smooth, Glossy, Vibrant, or Subtle)
+   - For grayscale colors (black, white, gray), generates smooth grayscale gradients
+   - For vibrant colors, generates same-hue gradients with varying lightness and saturation
+   - **Smooth**: 2-stop simple gradients
+   - **Glossy**: 3-4 stops with highlights for a glossy effect
+   - **Vibrant**: High saturation color bursts
+   - **Subtle**: Low saturation, gentle transitions
 
-3. **Clear Base Color:**
-   - Click the "×" button to return to fully random gradients
+3. **Manual Control:**
+   - Click any gradient stop indicator to select it
+   - Use the visible color picker to change the stop color to any value
+   - Drag the position slider or the stop itself on the gradient bar
+   - Add or remove stops as needed for complete control
 
 ### Preset Management
 
@@ -318,13 +340,26 @@ This project is open source and available under the [MIT License](LICENSE).
 - **FontAwesome** - Icon library provider
 - **Stream Deck** - Inspiration for icon dimensions and use case
 
-## Support
+## Support & Bug Reports
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/SyntaxSidekick/Stream-Deck-Icon-Generator/issues) page
-2. Open a new issue with detailed information
-3. Include browser version, OS, and steps to reproduce
+1. **Check Existing Issues**: Browse the [Issues page](https://github.com/SyntaxSidekick/Stream-Deck-Icon-Generator/issues) to see if your problem has been reported
+2. **Report a Bug**: Open a new issue with:
+   - Clear description of the problem
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Browser version and OS
+   - Screenshots if applicable
+3. **Feature Requests**: Suggest new features or improvements via GitHub Issues
+4. **Questions**: Ask questions in the Discussions section
+
+**Current Known Issues:**
+- Some gradient presets may not save correctly
+- File System Access API limited in Firefox/Safari (falls back to download)
+- Mobile touch interactions need refinement
+
+Your feedback helps improve this tool for everyone!
 
 ## Roadmap
 

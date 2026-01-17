@@ -9,9 +9,9 @@ export const state = {
     type: "linear", // "linear" | "radial"
     angle: 135,
     stops: [
-      { id: "a", color: "#ff7a18", pos: 0 },
-      { id: "b", color: "#ffb347", pos: 50 },
-      { id: "c", color: "#44B0B9", pos: 100 }
+      { id: "a", color: "#ff0000", pos: 0 },   // Red
+      { id: "b", color: "#00ff00", pos: 50 },  // Green
+      { id: "c", color: "#0000ff", pos: 100 }  // Blue
     ]
   },
 
@@ -28,6 +28,7 @@ export const state = {
 
   ui: {
     activeStopId: "b",
-    zoom: 1
+    zoom: 1,
+    colorMode: "rgb" // "rgb" | "hsl"
   }
 };

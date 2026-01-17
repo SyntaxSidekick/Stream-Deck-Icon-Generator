@@ -10,353 +10,179 @@
 
   <body>
     <a href="#mainContent" class="skip-link">Skip to main content</a>
-    <div class="shell">
-      <header class="topbar" role="banner">
-        <div class="brand">
-          <h1>Stream Deck Icon Generator</h1>
-          <p>Pick an SVG, tune a gradient, export a Stream Deck-ready PNG.</p>
+    <div class="wrap">
+      <header class="hero">
+        <div class="deck" aria-hidden="true">
+          <div class="key"></div><div class="key"></div><div class="key"></div>
+          <div class="key"></div><div class="key"></div><div class="key"></div>
         </div>
 
-        <nav class="pillrow" aria-label="Features and keyboard shortcuts">
-          <div class="pill" aria-label="Feature: Local SVG icons"><span class="dot" aria-hidden="true"></span> Local SVGs</div>
-          <div class="pill" aria-label="Feature: Canvas preview">Canvas Preview</div>
-          <div class="pill" aria-label="Feature: PNG export">PNG Export</div>
-          <div class="pill kbd" aria-label="Keyboard shortcut: Control I to open icons">Ctrl+I Open Icons</div>
-          <div class="pill kbd" aria-label="Keyboard shortcut: Control E to export">Ctrl+E Export</div>
-          <div class="pill kbd" aria-label="Keyboard shortcut: Arrow keys to adjust values">Arrows Adjust</div>
-        </nav>
+        <div class="title">
+          <h1>Stream Deck <span>ICON GENERATOR</span></h1>
+          <p>Create &amp; Export Custom Icons</p>
+        </div>
       </header>
 
       <main class="grid" id="mainContent">
-        <!-- LEFT: Controls -->
-        <section class="panel" aria-label="Icon and gradient controls">
-          <div class="panelHead">
-            <h2>Controls</h2>
-            <button class="btn small ghost" type="button" id="resetAll" aria-label="Reset all settings to defaults">
-              Reset
-            </button>
+        <!-- Icon Picker (TOP LEFT) -->
+        <section class="card" aria-label="Icon Picker">
+          <div class="card-head">
+            <div class="label">Icon Picker</div>
+            <div class="icons">
+              <button class="ico" type="button" id="iconPickerSettings" aria-label="Settings"></button>
+              <button class="ico" type="button" id="viewModeToggle" aria-label="View mode"></button>
+            </div>
           </div>
+          <div class="card-body">
+            <div class="search">
+              <div class="dot"></div>
+              <input type="search" id="quickIconSearch" placeholder="Search icons..." />
+            </div>
 
-          <div class="panelBody">
-            <!-- Icon -->
-            <fieldset class="section" aria-labelledby="iconSectionTitle">
-              <legend class="sectionTitle" id="iconSectionTitle">
-                <h3>Icon</h3>
-                <span aria-label="Icon type: Local SVG files">Local SVGs</span>
-              </legend>
-
-              <div class="iconPick">
-                <div class="iconPreview" id="smallIconPreview" aria-label="Selected icon preview" role="img"></div>
-
-                <div class="iconMeta">
-                  <strong id="selectedIconName" aria-live="polite">None selected</strong>
-                  <span id="selectedIconHint" aria-live="polite">Click "Choose Icon"</span>
-                </div>
-
-                <button class="btn" type="button" id="openIconPicker" aria-label="Open icon picker dialog" aria-haspopup="dialog">
-                  Choose Icon
-                </button>
-              </div>
-
-              <div class="twocol">
-                <div class="field">
-                  <label class="label" for="iconColor">Icon color</label>
-                  <div class="row">
-                    <input
-                      class="color"
-                      type="color"
-                      id="iconColor"
-                      value="#ffffff"
-                      aria-label="Pick icon color"
-                    />
-                    <input
-                      class="input"
-                      type="text"
-                      id="iconColorHex"
-                      value="#ffffff"
-                      placeholder="#ffffff"
-                      aria-label="Enter icon color hex value"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                    />
-                  </div>
-                </div>
-                <div class="field">
-                  <label class="label" for="iconSize">Icon size <span id="iconSizeValue" aria-live="polite">44%</span></label>
-                  <input
-                    class="range"
-                    type="range"
-                    id="iconSize"
-                    min="20"
-                    max="80"
-                    value="44"
-                    aria-label="Adjust icon size percentage"
-                    aria-valuemin="20"
-                    aria-valuemax="80"
-                    aria-valuenow="44"
-                  />
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="label" for="iconOffset">Vertical offset <span id="iconOffsetValue" aria-live="polite">0%</span></label>
-                <input
-                  class="range"
-                  type="range"
-                  id="iconOffset"
-                  min="-30"
-                  max="30"
-                  value="0"
-                  aria-label="Adjust vertical position offset"
-                  aria-valuemin="-30"
-                  aria-valuemax="30"
-                  aria-valuenow="0"
-                />
-              </div>
-            </fieldset>
-
-            <!-- Background / Gradient -->
-            <fieldset class="section" aria-labelledby="backgroundSectionTitle">
-              <legend class="sectionTitle" id="backgroundSectionTitle">
-                <h3>Background</h3>
-                <span aria-label="Background type: Gradient">Gradient</span>
-              </legend>
-
-              <div class="field">
-                <label class="label" for="presetSelect">Presets</label>
-                <div class="row">
-                  <select class="select" id="presetSelect" style="flex: 1;" aria-label="Select gradient preset">
-                    <option value="">Custom...</option>
-                  </select>
-                  <button class="btn small ghost" type="button" id="savePreset" aria-label="Save current gradient as preset">
-                    <span aria-hidden="true">💾</span>
-                    <span class="sr-only">Save preset</span>
-                  </button>
-                  <button class="btn small ghost" type="button" id="deletePreset" aria-label="Delete selected preset">
-                    <span aria-hidden="true">🗑️</span>
-                    <span class="sr-only">Delete preset</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <span class="label" id="gradBarLabel">Gradient preview (drag stops)</span>
-                <div class="gradBar" id="gradBar" role="slider" aria-labelledby="gradBarLabel" aria-label="Gradient preview with draggable color stops" tabindex="0"></div>
-              </div>
-
-              <div class="field">
-                <label class="label" for="randomBaseColor">Random base color (optional)</label>
-                <div class="row">
-                  <input
-                    class="color"
-                    type="color"
-                    id="randomBaseColor"
-                    value="#667eea"
-                    aria-label="Pick base color for randomization"
-                  />
-                  <input
-                    class="input"
-                    type="text"
-                    id="randomBaseColorHex"
-                    value="#667eea"
-                    placeholder="#667eea"
-                    aria-label="Enter base color hex value"
-                    pattern="^#[0-9A-Fa-f]{6}$"
-                  />
-                  <button class="btn small ghost" type="button" id="clearBaseColor" aria-label="Clear base color">
-                    <span aria-hidden="true">✕</span>
-                    <span class="sr-only">Clear</span>
-                  </button>
-                </div>
-              </div>
-
-              <button class="btn ghost" type="button" id="randomizeGradient" style="width: 100%;" aria-label="Generate random gradient">
-                <span aria-hidden="true">🎲</span> Randomize Gradient
-              </button>
-
-              <div class="split">
-                <div class="chipgroup" id="gradientType" role="group" aria-label="Gradient type">
-                  <button class="chip active" type="button" data-type="linear" aria-pressed="true" aria-label="Linear gradient">
-                    Linear
-                  </button>
-                  <button class="chip" type="button" data-type="radial" aria-pressed="false" aria-label="Radial gradient">
-                    Radial
-                  </button>
-                </div>
-
-                <div class="row" role="group" aria-label="Gradient stop controls">
-                  <button class="btn small ghost" type="button" id="addStop" aria-label="Add gradient color stop">
-                    Add stop
-                  </button>
-                  <button class="btn small ghost" type="button" id="removeStop" aria-label="Remove gradient color stop">
-                    Remove stop
-                  </button>
-                </div>
-              </div>
-
-              <div class="field">
-                <span class="label" id="gradientStyleLabel">Gradient style</span>
-                <div class="chipgroup" id="gradientStyle" role="group" aria-labelledby="gradientStyleLabel">
-                  <button class="chip" type="button" data-style="smooth" aria-pressed="false" aria-label="Smooth transition style">
-                    Smooth
-                  </button>
-                  <button class="chip" type="button" data-style="glossy" aria-pressed="false" aria-label="Glossy highlight effect style">
-                    Glossy
-                  </button>
-                  <button class="chip" type="button" data-style="vibrant" aria-pressed="false" aria-label="Bold vibrant colors style">
-                    Vibrant
-                  </button>
-                  <button class="chip" type="button" data-style="subtle" aria-pressed="false" aria-label="Soft subtle blend style">
-                    Subtle
-                  </button>
-                </div>
-              </div>
-
-              <div class="field" id="angleField">
-                <label class="label" for="angle">Angle (linear only) <span id="angleValue" aria-live="polite"></span></label>
-                <input
-                  class="range"
-                  type="range"
-                  id="angle"
-                  min="0"
-                  max="360"
-                  value="135"
-                  aria-label="Gradient angle in degrees"
-                  aria-valuemin="0"
-                  aria-valuemax="360"
-                  aria-valuenow="135"
-                />
-              </div>
-
-              <div class="twocol">
-                <div class="field">
-                  <label class="label" for="stopColor">Active stop color</label>
-                  <div class="row">
-                    <input
-                      class="color"
-                      type="color"
-                      id="stopColor"
-                      value="#ffb347"
-                      aria-label="Pick active gradient stop color"
-                    />
-                    <input
-                      class="input"
-                      type="text"
-                      id="stopColorHex"
-                      value="#ffb347"
-                      aria-label="Enter active stop color hex value"
-                      pattern="^#[0-9A-Fa-f]{6}$"
-                    />
-                  </div>
-                </div>
-                <div class="field">
-                  <label class="label" for="stopPos">Active stop position <span id="stopPosValue" aria-live="polite"></span></label>
-                  <input
-                    class="range"
-                    type="range"
-                    id="stopPos"
-                    min="0"
-                    max="100"
-                    value="50"
-                    aria-label="Active gradient stop position percentage"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="50"
-                  />
-                </div>
-              </div>
-            </fieldset>
-
-            <!-- Export -->
-            <fieldset class="section" aria-labelledby="exportSectionTitle">
-              <legend class="sectionTitle" id="exportSectionTitle">
-                <h3>Export</h3>
-                <span aria-label="Export format: PNG">PNG</span>
-              </legend>
-
-              <div class="twocol">
-                <div class="field">
-                  <label class="label" for="exportSize">Size</label>
-                  <select class="select" id="exportSize" aria-label="Select export size in pixels">
-                    <option value="72">72 × 72</option>
-                    <option value="144">144 × 144</option>
-                    <option value="256" selected>256 × 256</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label class="label" for="radius">Corner radius <span id="radiusValue" aria-live="polite"></span></label>
-                  <input
-                    class="range"
-                    type="range"
-                    id="radius"
-                    min="0"
-                    max="28"
-                    value="18"
-                    aria-label="Adjust corner radius in pixels"
-                    aria-valuemin="0"
-                    aria-valuemax="28"
-                    aria-valuenow="18"
-                  />
-                </div>
-              </div>
-              <div class="field">
-                <label class="label" for="iconNameInput">Icon name</label>
-                <input
-                  class="input"
-                  type="text"
-                  id="iconNameInput"
-                  placeholder="e.g. github-gradient"
-                  aria-label="Enter icon file name"
-                />
-              </div>
-
-              <button class="btn primary" type="button" id="exportBtn" aria-label="Export PNG at selected size">
-                Export PNG
-              </button>
-              <div class="row" role="group" aria-label="Export options">
-                <button class="btn ghost" type="button" id="batchExportBtn" aria-label="Export PNG at 72, 144, and 256 pixel sizes">
-                  Export All Sizes
-                </button>
-                <button class="btn ghost small" type="button" id="copyToClipboard" aria-label="Copy icon to clipboard">
-                  <span aria-hidden="true">📋</span> Copy
-                </button>
-              </div>
-              <p class="help" id="exportHint" aria-live="polite">
-                Exports current preview as PNG. Batch exports 72, 144, and 256 sizes.
-              </p>
-            </fieldset>
+            <div class="icon-grid" id="iconPickerGrid"></div>
           </div>
         </section>
 
-        <!-- RIGHT: Preview -->
-        <section class="panel" aria-label="Icon preview">
-          <div class="previewWrap">
-            <div class="previewHeader">
-              <h2>Preview</h2>
+        <!-- Preview (TOP RIGHT) -->
+        <section class="card" aria-label="Preview">
+          <div class="card-head">
+            <div class="label">PREVIEW</div>
+            <div class="icons">
+              <button class="ico" type="button" aria-label="Zoom"></button>
+              <button class="ico" type="button" aria-label="Options"></button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="previewShell">
+              <div class="checker"></div>
+              <div class="keycap" id="canvasWrap">
+                <canvas id="canvas" width="256" height="256" role="img" aria-label="Generated icon"></canvas>
+              </div>
+            </div>
+            <div class="previewFoot">
               <div class="chipgroup" id="zoomGroup" role="group" aria-label="Zoom level">
-                <button class="chip active" type="button" data-zoom="1" aria-pressed="true" aria-label="Zoom 1x actual size">
-                  1× Actual
-                </button>
+                <button class="chip active" type="button" data-zoom="1" aria-pressed="true">1× Actual Size</button>
+                <button class="chip" type="button" data-zoom="4" aria-pressed="false">4x</button>
+                <button class="chip" type="button" data-zoom="8" aria-pressed="false">8x</button>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <button class="chip" type="button" data-zoom="4" aria-pressed="false" aria-label="Zoom 4x magnification">4x</button>
-                <button class="chip" type="button" data-zoom="8" aria-pressed="false" aria-label="Zoom 8x magnification">8x</button>
+        <!-- Gradient Editor (BOTTOM LEFT) -->
+        <section class="card" aria-label="Gradient Editor">
+          <div class="card-head">
+            <div class="label">Gradient Editor</div>
+            <div class="icons">
+              <button class="ico" type="button" id="gradientTypeBtn" data-type="linear" aria-label="Gradient type"></button>
+              <button class="ico" type="button" id="resetGradient" aria-label="Reset gradient"></button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="grad-bar" id="gradBar" tabindex="0" aria-label="Gradient preview"></div>
+
+            <div class="row">
+              <div class="tiny" aria-hidden="true"></div>
+              <div class="stopIndicators" id="stopIndicators"></div>
+            </div>
+
+            <div class="row">
+              <label style="color:rgba(255,255,255,.65);font-size:11px;font-weight:700;width:80px;">Base Color</label>
+              <input type="color" id="baseColorPicker" value="#ff0000" style="width:32px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:transparent;cursor:pointer;" />
+              <div style="display:flex;gap:6px;flex:1;flex-wrap:wrap;">
+                <button class="btn-style" data-style="smooth" title="Smooth gradient">Smooth</button>
+                <button class="btn-style" data-style="glossy" title="Glossy gradient">Glossy</button>
+                <button class="btn-style" data-style="vibrant" title="Vibrant gradient">Vibrant</button>
+                <button class="btn-style" data-style="subtle" title="Subtle gradient">Subtle</button>
               </div>
             </div>
 
-            <div class="previewStage" role="img" aria-label="Icon preview canvas">
-              <div class="checker">
-                <div class="canvasWrap" id="canvasWrap">
-                  <canvas id="canvas" width="256" height="256" role="img" aria-label="Generated icon preview"></canvas>
-                </div>
+            <div class="row" id="angleField">
+              <div class="tiny" aria-hidden="true"></div>
+              <div class="slider">
+                <input type="range" class="range-input" id="angle" min="0" max="360" value="135" aria-label="Gradient angle" />
+                <div class="knob" id="angleKnob"></div>
               </div>
+              <div class="pill" id="angleValueDisplay">135°</div>
+              <button class="btn small" id="randomizeGradient">Randomize</button>
             </div>
 
-            <div class="previewFooter">
-              <span>Preview: <strong id="previewLabel" aria-live="polite">256 × 256</strong></span>
-              <span class="kbd" aria-label="Tip: export at 256 pixels then downscale">Tip: export 256 → downscale</span>
+            <div class="row" id="stopColorField">
+              <button class="tiny iconBtn" type="button" id="toggleStopColor" aria-label="Toggle stop color"></button>
+              <input type="color" id="stopColorVisible" value="#00ff00" style="width:32px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:transparent;cursor:pointer;" title="Stop color" />
+              <div class="slider">
+                <input type="range" class="range-input" id="stopPos" min="0" max="100" value="50" aria-label="Stop position" />
+                <div class="knob" id="stopPosKnob"></div>
+              </div>
+              <div class="pill" id="stopPosValueDisplay">50%</div>
+              <button class="tiny iconBtn" type="button" id="removeStop" title="Remove stop">−</button>
+              <button class="tiny iconBtn" type="button" id="addStop" title="Add stop">+</button>
+              <button class="tiny iconBtn" type="button" id="copyGrad" aria-label="Copy"></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Export Options (BOTTOM RIGHT) -->
+        <section class="card" aria-label="Export Options">
+          <div class="card-head">
+            <div class="label">Export Options</div>
+            <div class="icons">
+              <button class="ico" type="button" id="exportSettings" aria-label="Settings"></button>
+              <button class="ico" type="button" id="exportCollapse" aria-label="Collapse"></button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="field">
+              <label for="iconNameInput" style="color:rgba(255,255,255,.65);font-weight:800;">Icon name</label>
+              <input type="text" id="iconNameInput" placeholder="angular" style="all:unset;flex:1;margin-left:10px;" />
+            </div>
+
+            <div class="checks">
+              <label><input type="checkbox" id="size72" checked /> 72 px</label>
+              <label><input type="checkbox" id="size144" checked /> 144 px</label>
+              <label><input type="checkbox" id="size256" checked /> 256 px</label>
+            </div>
+
+            <div class="exportRow">
+              <button class="btnPrimary" id="exportBtn">Export PNGs</button>
+              <button class="btnBlue" id="copyToClipboard">Copy to Clipboard</button>
             </div>
           </div>
         </section>
       </main>
+
+      <footer class="footer" aria-label="Feature summary">
+        SVG Icons  <span>|</span>  Custom Gradients  <span>|</span>  Pixel Perfect Preview  <span>|</span>  Local &amp; Fast!
+      </footer>
+    </div>
+
+      <!-- Hidden form fields for functionality -->
+      <div style="display: none;">
+        <input type="color" id="stopColor" value="#ffb347" />
+        <input type="text" id="stopColorHex" value="#ffb347" />
+        <input type="color" id="iconColor" value="#ffffff" />
+        <input type="text" id="iconColorHex" value="#ffffff" />
+        <input type="range" id="iconSize" min="20" max="80" value="44" />
+        <input type="range" id="iconOffset" min="-30" max="30" value="0" />
+        <input type="range" id="radius" min="0" max="28" value="18" />
+        <select id="exportSize"><option value="256" selected>256</option></select>
+        <select id="presetSelect"><option value="">Custom...</option></select>
+        <button id="savePreset">Save</button>
+        <button id="deletePreset">Delete</button>
+        <button id="resetAll">Reset</button>
+        <button id="batchExportBtn">Batch</button>
+        <span id="previewLabel">256 × 256</span>
+        <span id="radiusValue"></span>
+        <span id="iconSizeValue">44%</span>
+        <span id="iconOffsetValue">0%</span>
+        <span id="selectedIconName">None</span>
+        <span id="selectedIconHint">Choose</span>
+        <div id="smallIconPreview"></div>
+        <button id="openIconPicker">Open Picker</button>
+      </div>
     </div>
 
     <!-- Modal: Icon Picker -->
